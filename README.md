@@ -29,5 +29,6 @@ and reboot the machine.
 3) Creates a new user `kodi`
 4) Installs Kodi from flathub and set it as autostart application for `kodi` user
 5) Update GDM to automatically login as `kodi` user
-6) Creates cron job that is keeping Silverblue and Kodi up to date
-7) Does a reboot (you should end up in Kodi, you still need to go through the initial gnome setup)
+6) Disable specific gnome features (screensaver, dim screen, automatic updates)
+7) Creates cron job that is keeping Silverblue and Kodi up to date
+8) Does a reboot (you should end up in Kodi)
