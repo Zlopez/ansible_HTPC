@@ -46,6 +46,13 @@
       path: "/home/kodi/.config/autostart"
       state: directory
 
+  - name: Create gnome-initial-setup-done file
+    become_user: kodi
+    copy:
+      dest: "/home/kodi/.config/gnome-initial-setup-done"
+      content: |
+        yes
+
   - name: Configure kodi as autostart application
     file:
       src: "/var/lib/flatpak/exports/share/applications/tv.kodi.Kodi.desktop"
