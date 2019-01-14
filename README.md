@@ -10,6 +10,8 @@ This is a simple ansible script that will setup HTPC machine from Fedora Silverb
 
 Fedora 29 Silverblue doesn't have python 2. This is the reason why you need to specify python interpreter.
 
+If you don't want automatic updates add `--skip-tags auto-updates`.
+
 ### How to start SSH daemon on Silverblue
 If you created Silverblue with only root user, you will end up in GNOME logged as gnome-initial-setup user.
 To login as root you need to edit GRUB entry:
