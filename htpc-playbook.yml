@@ -66,5 +66,5 @@
       hour: 4
       job: "flatpak update -y; rpm-ostree upgrade; reboot"
 
-  - name: Rebbot machine
+  - name: Reboot machine
     reboot:
