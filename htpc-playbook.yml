@@ -9,8 +9,7 @@
 
   # Cron is missing on Silverblue and we need it to setup automatic updates later
   - name: Install cron
-    command: rpm-ostree install cronie
-
+    command: rpm-ostree install --idempotent cronie
 
   - name: Reboot the machine
     reboot:
