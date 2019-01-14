@@ -42,18 +42,22 @@
 
   - name: Create autostart directory
     become_user: kodi
+    become: true
     file:
       path: "/home/kodi/.config/autostart"
       state: directory
 
   - name: Create gnome-initial-setup-done file
     become_user: kodi
+    become: true
     copy:
       dest: "/home/kodi/.config/gnome-initial-setup-done"
       content: |
         yes
 
   - name: Configure kodi as autostart application
+    become_user: kodi
+    become: true
     file:
       src: "/var/lib/flatpak/exports/share/applications/tv.kodi.Kodi.desktop"
       path: "/home/kodi/.config/autostart/tv.kodi.Kodi.desktop"
@@ -67,17 +71,24 @@
         AutomaticLoginEnable=True
         AutomaticLogin=kodi
 
-  - name: Disable screensaver and sleep mode
+  - name: Disable specific gnome features
     become_user: kodi
+    become: true
     dconf:
       key: "{{ item.key }}"
       value: "{{ item.value }}"
     loop:
+        # Display dim
       - key: "/org/gnome/settings-daemon/plugins/power/idle-dim"
         value: "false"
+        # Sleep over time
       - key: "/org/gnome/settings-daemon/plugins/power/sleep-inactive-ac-type"
         value: "'nothing'"
+        # Screensaver
       - key: "/org/gnome/desktop/screensaver/lock-enabled"
+        value: "false"
+        # Automatic updates
+      - key: "/org/gnome/software/download-updates"
         value: "false"
 
   # If you don't want automatic updates run the ansible with `--skip-tags auto-updates`
