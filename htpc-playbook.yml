@@ -57,7 +57,7 @@
         AutomaticLoginEnable=True
         AutomaticLogin=kodi
 
-  # Just comment this if you don't want automatic updates
+  # If you don't want automatic updates run the ansible with `--skip-tags auto-updates`
   - name: Setup automatic updates
     cron:
       name: "Updates"
@@ -65,6 +65,8 @@
       minute: 0
       hour: 4
       job: "flatpak update -y; rpm-ostree upgrade; reboot"
+    tags:
+      - auto-updates
 
   - name: Reboot machine
     reboot:
