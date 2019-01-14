@@ -11,6 +11,10 @@
   - name: Install cron
     command: rpm-ostree install --idempotent cronie
 
+  # python3-psutil package is needed by dconf module
+  - name: Install psutil
+    command: rpm-ostree install --idempotent python3-psutil
+
   - name: Reboot the machine
     reboot:
 
@@ -55,6 +59,19 @@
       block: |
         AutomaticLoginEnable=True
         AutomaticLogin=kodi
+
+  - name: Disable screensaver and sleep mode
+    become_user: kodi
+    dconf:
+      key: "{{ item.key }}"
+      value: "{{ item.value }}"
+    loop:
+      - key: "/org/gnome/settings-daemon/plugins/power/idle-dim"
+        value: "false"
+      - key: "/org/gnome/settings-daemon/plugins/power/sleep-inactive-ac-type"
+        value: "'nothing'"
+      - key: "/org/gnome/desktop/screensaver/lock-enabled"
+        value: "false"
 
   # If you don't want automatic updates run the ansible with `--skip-tags auto-updates`
   - name: Setup automatic updates
