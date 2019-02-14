@@ -6,7 +6,12 @@
   tasks:
   - name: Upgrade Silverblue to latest ostree image
     command: rpm-ostree upgrade
-
+    
+  # reboot the machine after upgrade
+  # Layering after upgrade without reboot could cause ostree image corruption
+  - name: Reboot the machine
+    reboot:
+    
   # Cron is missing on Silverblue and we need it to setup automatic updates later
   - name: Install cron
     command: rpm-ostree install --idempotent cronie
