@@ -2,6 +2,8 @@
 - name: Install and configure HTPC
   hosts: all
   remote_user: root
+  roles:
+    - role: htpc
 
   tasks:
   - name: Upgrade Silverblue to latest ostree image
@@ -12,16 +14,16 @@
   - name: Reboot the machine
     reboot:
     
-  # Cron is missing on Silverblue and we need it to setup automatic updates later
-  - name: Install cron
-    command: rpm-ostree install --idempotent cronie
+  ## Cron is missing on Silverblue and we need it to setup automatic updates later
+  #- name: Install cron
+  #  command: rpm-ostree install --idempotent cronie
 
-  # python3-psutil package is needed by dconf module
-  - name: Install psutil
-    command: rpm-ostree install --idempotent python3-psutil
+  ## python3-psutil package is needed by dconf module
+  #- name: Install psutil
+  #  command: rpm-ostree install --idempotent python3-psutil
 
-  - name: Reboot the machine
-    reboot:
+  #- name: Reboot the machine
+  #  reboot:
 
   - name: Create kodi user
     user:
@@ -33,24 +35,24 @@
       state: present
       flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
 
-  # This is not working right now - https://github.com/ansible/ansible/pull/48049
-  #- name: Install kodi
-  #  become_user: kodi
-  #  flatpak:
-  #    name: tv.kodi.Kodi
-  #    state: present
-  #    method: user
-
-  # So we need another method
+  #  This is not working right now - https://github.com/ansible/ansible/pull/48049
   - name: Install kodi
-    command: flatpak install -y flathub tv.kodi.Kodi
-
-  - name: Create autostart directory
     become_user: kodi
-    become: true
-    file:
-      path: "/home/kodi/.config/autostart"
-      state: directory
+    flatpak:
+      name: tv.kodi.Kodi
+      state: present
+      method: user
+
+  ## So we need another method
+  #- name: Install kodi
+  #  command: flatpak install -y flathub tv.kodi.Kodi
+
+  #- name: Create autostart directory
+  #  become_user: kodi
+  #  become: true
+  #  file:
+  #    path: "/home/kodi/.config/autostart"
+  #    state: directory
 
   - name: Create gnome-initial-setup-done file
     become_user: kodi
@@ -60,13 +62,13 @@
       content: |
         yes
 
-  - name: Configure kodi as autostart application
-    become_user: kodi
-    become: true
-    file:
-      src: "/var/lib/flatpak/exports/share/applications/tv.kodi.Kodi.desktop"
-      path: "/home/kodi/.config/autostart/tv.kodi.Kodi.desktop"
-      state: link
+  #- name: Configure kodi as autostart application
+  #  become_user: kodi
+  #  become: true
+  #  file:
+  #    src: "/var/lib/flatpak/exports/share/applications/tv.kodi.Kodi.desktop"
+  #    path: "/home/kodi/.config/autostart/tv.kodi.Kodi.desktop"
+  #    state: link
 
   - name: Add autologin to kodi user
     blockinfile:
