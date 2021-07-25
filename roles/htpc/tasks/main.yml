@@ -71,36 +71,52 @@
       AutomaticLoginEnable=True
       AutomaticLogin=kodi
 
-- name: Disable specific gnome features
-  become_user: kodi
-  become: true
-  dconf:
-    key: "{{ item.key }}"
-    value: "{{ item.value }}"
-  loop:
-      # Display dim
-    - key: "/org/gnome/settings-daemon/plugins/power/idle-dim"
-      value: "false"
-      # Sleep over time
-    - key: "/org/gnome/settings-daemon/plugins/power/sleep-inactive-ac-type"
-      value: "'nothing'"
-      # Screensaver
-    - key: "/org/gnome/desktop/screensaver/lock-enabled"
-      value: "false"
-      # Automatic updates
-    - key: "/org/gnome/software/download-updates"
-      value: "false"
+#- name: Disable specific gnome features
+#  become_user: kodi
+#  become: true
+#  dconf:
+#    key: "{{ item.key }}"
+#    value: "{{ item.value }}"
+#  loop:
+#      # Display dim
+#    - key: "/org/gnome/settings-daemon/plugins/power/idle-dim"
+#      value: "false"
+#      # Sleep over time
+#    - key: "/org/gnome/settings-daemon/plugins/power/sleep-inactive-ac-type"
+#      value: "'nothing'"
+#      # Screensaver
+#    - key: "/org/gnome/desktop/screensaver/lock-enabled"
+#      value: "false"
+#      # Automatic updates
+#    - key: "/org/gnome/software/download-updates"
+#      value: "false"
 
 # If you don't want automatic updates run the ansible with `--skip-tags auto-updates`
-- name: Setup automatic updates
-  cron:
-    name: "Updates"
-    weekday: 3
-    minute: 0
-    hour: 4
-    job: "flatpak update -y; rpm-ostree upgrade; reboot"
+- name: Install upgrade service
+  copy:
+    src: upgrade.service
+    dest: /etc/systemd/system/
   tags:
     - auto-updates
 
+- name: Install upgrade timer
+  copy:
+    src: upgrade.timer
+    dest: /etc/systemd/system/
+  tags:
+    - auto-updates
+
+- name: Just force systemd to reread configs
+  ansible.builtin.systemd:
+    daemon_reload: yes
+
+- name: Enable upgrade timer
+  ansible.builtin.systemd:
+    name: upgrade.timer
+    state: started
+    enabled: yes
+  tags:
+    - auto-updates
+    
 - name: Reboot machine
   reboot:
