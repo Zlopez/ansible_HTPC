@@ -23,16 +23,18 @@
     name: kodi
 
 - name: Add the flathub flatpak repository remote to the user installation
-  flatpak_remote:
+  community.general.flatpak_remote:
     name: flathub
     state: present
     flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
 
-#  This is not working right now - https://github.com/ansible/ansible/pull/48049
-- name: Install kodi
+# This is not working right now - https://github.com/ansible/ansible/pull/48049
+- name: Install kodi and VLC
   become_user: kodi
-  flatpak:
-    name: tv.kodi.Kodi
+  community.general.flatpak:
+    name:
+      - tv.kodi.Kodi
+      - org.videolan.VLC
     state: present
     method: user
 
