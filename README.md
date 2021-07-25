@@ -3,32 +3,31 @@ This is a simple ansible script that will setup HTPC machine from Fedora Silverb
 
 ## Prerequisites
 * SSH access to target machine
-* Clean Fedora 29 Silverblue installation
+* Clean Fedora 34 Silverblue installation
+* `community.general` collection for flatpak ansible roles. Install it using `ansible-galaxy collection install community.general`
 
 ## How to run this playbook
-`ansible-playbook -i <target_ip_address>, htpc-playbook.yml -e 'ansible_python_interpreter=/usr/bin/python3'`
+`ansible-playbook -i <target_ip_address>, -u <administrator_user> -k -K htpc-playbook.yml`
 
-Fedora 29 Silverblue doesn't have python 2. This is the reason why you need to specify python interpreter.
+`-k` and `-K` is needed to enter the user password for ssh and sudo.
 
 If you don't want automatic updates add `--skip-tags auto-updates`.
 
 ### How to start SSH daemon on Silverblue
-If you created Silverblue with only root user, you will end up in GNOME logged as gnome-initial-setup user.
-To login as root you need to edit GRUB entry:
+After installation you will end up in GNOME logged as gnome-initial-setup user.
+Create a administrator user which will be used to provision the machine by ansible.
 
-1) Wait till you enter GRUB and hit `e`
-2) Add `3` to line beggining with `linux16`
-3) Hit `CTRL + x`
+1) Run terminal, press `Super` (key between ALT and CTRL) and type `terminal`
+2) Start sshd `systemctl start sshd`
+3) Enable sshd `systemctl enable sshd`
 
-You will end up in terminal and can login as root. To enable SSH daemon just run `systemctl enable sshd`
-and reboot the machine.
 
 ### What this script does?
-1) Updates Silverblue to latest ostree image and installs cron
+1) Updates Silverblue to latest ostree image
 2) Does a reboot to apply new ostree image
-3) Creates a new user `kodi`
-4) Installs Kodi from flathub and set it as autostart application for `kodi` user
-5) Update GDM to automatically login as `kodi` user
-6) Disable specific gnome features (screensaver, dim screen, automatic updates)
-7) Creates cron job that is keeping Silverblue and Kodi up to date
-8) Does a reboot (you should end up in Kodi)
+3) Creates a new user `htpc`
+4) Installs Kodi and VLC from flathub for `htpc` user
+5) Update GDM to automatically login as `htpc` user
+6) Disable some gnome features - sleep over time, display dim, automatic updates through GNOME Software, Screensaver
+7) Creates systemd-timer that is keeping system up to date (Use `--skip tags auto-updates` if you don't want this functionality)
+8) Does a reboot (you should be logged in as `htpc` user)

@@ -1,6 +1,9 @@
 ---
 - name: Install and configure HTPC
   hosts: all
-  remote_user: root
+  become_method: sudo
+  become: yes
   roles:
     - role: htpc
+      vars:
+        username: "htpc"
