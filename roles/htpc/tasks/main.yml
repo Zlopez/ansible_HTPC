@@ -24,11 +24,19 @@
     state: present
     flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
 
+# The Brave browser is only on flathub-beta right now
+- name: Add the flathub flatpak repository remote
+  community.general.flatpak_remote:
+    name: flathub-beta
+    state: present
+    flatpakrepo_url: https://dl.flathub.org/beta-repo/flathub-beta.flatpakrepo
+
 - name: Install kodi and VLC
   community.general.flatpak:
     name:
       - tv.kodi.Kodi
       - org.videolan.VLC
+      - com.brave.Browser
     state: present
 
 - name: Create gnome-initial-setup-done file
