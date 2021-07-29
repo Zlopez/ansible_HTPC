@@ -1,0 +1,9 @@
+[Unit]
+Description=Run upgrade and reboot machine weekly
+
+[Timer]
+Unit=upgrade.service
+OnCalendar=Wed *-*-* 03:00:00
+
+[Install]
+WantedBy=timers.target
