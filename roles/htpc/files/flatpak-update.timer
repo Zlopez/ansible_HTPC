@@ -1,0 +1,9 @@
+[Unit]
+Description=Run flatpak update weekly
+
+[Timer]
+Unit=flatpak-update.service
+OnCalendar=Wed *-*-* 02:30:00
+
+[Install]
+WantedBy=timers.target

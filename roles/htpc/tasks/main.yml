@@ -19,25 +19,43 @@
     name: "{{ username }}"
 
 - name: Add the flathub flatpak repository remote
+  become_user: "{{ username }}"
+  become: yes
   community.general.flatpak_remote:
+    method: user
     name: flathub
     state: present
     flatpakrepo_url: https://dl.flathub.org/repo/flathub.flatpakrepo
 
 # The Brave browser is only on flathub-beta right now
 - name: Add the flathub flatpak repository remote
+  become_user: "{{ username }}"
+  become: yes
   community.general.flatpak_remote:
+    method: user
     name: flathub-beta
     state: present
     flatpakrepo_url: https://dl.flathub.org/beta-repo/flathub-beta.flatpakrepo
 
-- name: Install kodi and VLC
+- name: Install Kodi and VLC flatpaks
+  become_user: "{{ username }}"
+  become: yes
   community.general.flatpak:
     name:
       - tv.kodi.Kodi
       - org.videolan.VLC
-      - com.brave.Browser
+    method: user
     state: present
+
+- name: Install Brave flatpak
+  become_user: "{{ username }}"
+  become: yes
+  community.general.flatpak:
+    name:
+      - com.brave.Browser
+    method: user
+    state: present
+    remote: flathub-beta
 
 - name: Create gnome-initial-setup-done file
   become_user: "{{ username }}"
@@ -90,6 +108,32 @@
   tags:
     - auto-updates
 
+- name: Create user systemd directory
+  become_user: "{{ username }}"
+  become: yes
+  file:
+    path: ~/.config/systemd/user/
+    state: directory
+
+# Flatpak needs to be run by currently logged user
+- name: Install flatpak update service
+  copy:
+    src: flatpak-update.service
+    dest: ~/.config/systemd/user/flatpak-update.service
+  become_user: "{{ username }}"
+  become: yes
+  tags:
+    - auto-updates
+
+- name: Install flatpak-update timer
+  copy:
+    src: flatpak-update.timer
+    dest: ~/.config/systemd/user/flatpak-update.timer
+  become_user: "{{ username }}"
+  become: yes
+  tags:
+    - auto-updates
+
 - name: Just force systemd to reread configs
   ansible.builtin.systemd:
     daemon_reload: yes
@@ -102,5 +146,16 @@
   tags:
     - auto-updates
     
+- name: Enable flatpak-update timer
+  ansible.builtin.systemd:
+    name: flatpak-update.timer
+    state: started
+    enabled: yes
+    scope: user
+  become_user: "{{ username }}"
+  become: yes
+  tags:
+    - auto-updates
+
 - name: Reboot machine
   reboot:

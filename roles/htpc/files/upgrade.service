@@ -3,6 +3,5 @@ Description=Upgrade machine to latest version
 
 [Service]
 ExecStart=/usr/bin/rpm-ostree upgrade
-#ExecStart=/usr/bin/flatpak update -y
 ExecStart=reboot
 Type=oneshot
