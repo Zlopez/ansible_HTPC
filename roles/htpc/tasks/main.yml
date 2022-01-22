@@ -57,6 +57,14 @@
     state: present
     remote: flathub-beta
 
+- name: Create a directory if it does not exist
+  become_user: "{{ username }}"
+  become: yes
+  ansible.builtin.file:
+    path: "/home/{{ username }}/.config"
+    state: directory
+    mode: '0755'
+
 - name: Create gnome-initial-setup-done file
   become_user: "{{ username }}"
   become: yes
@@ -145,8 +153,21 @@
     enabled: yes
   tags:
     - auto-updates
-    
+
+- name: Find uid of user
+  command: "id -u {{ username }}"
+  register: the_user_uid
+  check_mode: no # Run even in check mode, otherwise the playbook fails with --check.
+  changed_when: false
+
+- name: Determine XDG_RUNTIME_DIR
+  set_fact:
+    xdg_runtime_dir: "/run/user/{{ the_user_uid.stdout }}"
+  changed_when: false
+
 - name: Enable flatpak-update timer
+  environment:
+    XDG_RUNTIME_DIR: "{{ xdg_runtime_dir }}"
   ansible.builtin.systemd:
     name: flatpak-update.timer
     state: started
